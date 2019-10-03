@@ -1,11 +1,13 @@
-package pl.akademiaspring.cars;
+package pl.akademiaspring.cars.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.akademiaspring.cars.model.Car;
+import pl.akademiaspring.cars.service.CarService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,13 +15,13 @@ import java.util.Optional;
 @RequestMapping("/cars")
 public class CarApi {
 
+    private CarService carService;
     private List<Car> carsList;
 
-    public CarApi() {
-        this.carsList = new ArrayList();
-        carsList.add(new Car(1L, "Volvo", "V70", "GREY"));
-        carsList.add(new Car(2L, "Audi", "A6", "BLACK"));
-        carsList.add(new Car(3L, "Kia", "Stinger", "RED"));
+    @Autowired
+    public CarApi (CarService carService){
+        this.carService = carService;
+        this.carsList = carService.getCarsList();
     }
 
     @GetMapping(produces = {
@@ -85,7 +87,7 @@ public class CarApi {
     public ResponseEntity removeCar(@PathVariable long id){
         Optional<Car> firstCar = carsList.stream().filter(carFromList -> carFromList.getId() == id).findFirst();
         if(firstCar.isPresent()){
-           carsList.remove(firstCar.get());
+            carsList.remove(firstCar.get());
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);

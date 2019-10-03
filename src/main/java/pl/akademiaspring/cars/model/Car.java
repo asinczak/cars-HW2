@@ -1,4 +1,4 @@
-package pl.akademiaspring.cars;
+package pl.akademiaspring.cars.model;
 
 public class Car {
 
