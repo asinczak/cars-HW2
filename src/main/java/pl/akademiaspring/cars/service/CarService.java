@@ -5,6 +5,7 @@ import pl.akademiaspring.cars.model.Car;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CarService {
@@ -20,5 +21,45 @@ public class CarService {
 
     public List<Car> getCarsList() {
         return carsList;
+    }
+
+    public Optional<Car> getCarById (long id){
+        return carsList.stream().filter(car -> car.getId() == id).findFirst();
+    }
+
+    public Optional<Car> getCarByColour(String colour) {
+        return carsList.stream().filter(car -> car.getColour().equals(colour)).findFirst();
+    }
+
+    public boolean addCar(Car car) {
+        return carsList.add(car);
+    }
+
+    public boolean modCar(Car car) {
+        Optional<Car> firstCar = carsList.stream().filter(carFromList -> carFromList.getId() == car.getId()).findFirst();
+        if(firstCar.isPresent()) {
+            carsList.remove(firstCar.get());
+            carsList.add(car);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean modCarElement(long id, String colour) {
+        Optional<Car> firstCar = carsList.stream().filter(carFromList -> carFromList.getId() == id).findFirst();
+        if(firstCar.isPresent()){
+            firstCar.get().setColour(colour);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeCar(long id) {
+        Optional<Car> firstCar = carsList.stream().filter(carFromList -> carFromList.getId() == id).findFirst();
+        if(firstCar.isPresent()){
+            carsList.remove(firstCar.get());
+            return true;
+        }
+        return false;
     }
 }

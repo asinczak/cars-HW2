@@ -13,29 +13,29 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/cars")
+@CrossOrigin
 public class CarApi {
 
     private CarService carService;
-    private List<Car> carsList;
+
 
     @Autowired
     public CarApi (CarService carService){
         this.carService = carService;
-        this.carsList = carService.getCarsList();
     }
 
     @GetMapping(produces = {
-            MediaType.APPLICATION_XML_VALUE,
-            MediaType.APPLICATION_JSON_VALUE})
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<List<Car>> getCars(){
-        return new ResponseEntity<>(carsList, HttpStatus.OK);
+        return new ResponseEntity<>(carService.getCarsList(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = {
             MediaType.APPLICATION_XML_VALUE,
             MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Car> getCarById(@PathVariable long id){
-        Optional<Car> firstCar = carsList.stream().filter(car -> car.getId() == id).findFirst();
+       Optional<Car> firstCar = carService.getCarById(id);
         if(firstCar.isPresent()){
             return new ResponseEntity<>(firstCar.get(), HttpStatus.OK);
         }
@@ -46,7 +46,7 @@ public class CarApi {
             MediaType.APPLICATION_XML_VALUE,
             MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Car> getCarByColour(@RequestParam String colour){
-        Optional<Car> firstCar = carsList.stream().filter(car -> car.getColour().equals(colour)).findFirst();
+        Optional<Car> firstCar = carService.getCarByColour(colour);
         if(firstCar.isPresent()){
             return new ResponseEntity<>(firstCar.get(), HttpStatus.OK);
         }
@@ -55,8 +55,7 @@ public class CarApi {
 
     @PostMapping
     public ResponseEntity addCar(@RequestBody Car car){
-        boolean add = carsList.add(car);
-        if(add){
+        if(carService.addCar(car)){
             return new ResponseEntity(HttpStatus.CREATED);
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -64,10 +63,7 @@ public class CarApi {
 
     @PutMapping
     public ResponseEntity modCar(@RequestBody Car car){
-        Optional<Car> firstCar = carsList.stream().filter(carFromList -> carFromList.getId() == car.getId()).findFirst();
-        if(firstCar.isPresent()){
-            carsList.remove(firstCar.get());
-            carsList.add(car);
+        if(carService.modCar(car)){
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -75,9 +71,7 @@ public class CarApi {
 
     @PatchMapping("/{id}/{colour}")
     public ResponseEntity modCarElement(@PathVariable long id, @PathVariable String colour){
-        Optional<Car> firstCar = carsList.stream().filter(carFromList -> carFromList.getId() == id).findFirst();
-        if(firstCar.isPresent()){
-           firstCar.get().setColour(colour);
+        if(carService.modCarElement(id, colour)){
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -85,9 +79,7 @@ public class CarApi {
 
     @DeleteMapping("/{id}")
     public ResponseEntity removeCar(@PathVariable long id){
-        Optional<Car> firstCar = carsList.stream().filter(carFromList -> carFromList.getId() == id).findFirst();
-        if(firstCar.isPresent()){
-            carsList.remove(firstCar.get());
+        if(carService.removeCar(id)){
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
