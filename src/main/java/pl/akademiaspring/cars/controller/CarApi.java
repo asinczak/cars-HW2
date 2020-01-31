@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/cars")
-@CrossOrigin
+//@CrossOrigin
 public class CarApi {
 
     private CarService carService;
@@ -24,16 +24,18 @@ public class CarApi {
         this.carService = carService;
     }
 
-    @GetMapping(produces = {
-            MediaType.APPLICATION_JSON_VALUE,
-            MediaType.APPLICATION_XML_VALUE})
+    @GetMapping
+//    @GetMapping(produces = {
+//            MediaType.APPLICATION_JSON_VALUE,
+////            MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<List<Car>> getCars(){
         return new ResponseEntity<>(carService.getCarsList(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}", produces = {
-            MediaType.APPLICATION_XML_VALUE,
-            MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/{id}")
+//    @GetMapping(value = "/{id}", produces = {
+//            MediaType.APPLICATION_XML_VALUE,
+//            MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Car> getCarById(@PathVariable long id){
        Optional<Car> firstCar = carService.getCarById(id);
         if(firstCar.isPresent()){
@@ -42,9 +44,10 @@ public class CarApi {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(value = "/byColour", produces = {
-            MediaType.APPLICATION_XML_VALUE,
-            MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/byColour")
+//    @GetMapping(value = "/byColour", produces = {
+//            MediaType.APPLICATION_XML_VALUE,
+//            MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Car> getCarByColour(@RequestParam String colour){
         Optional<Car> firstCar = carService.getCarByColour(colour);
         if(firstCar.isPresent()){
@@ -56,7 +59,7 @@ public class CarApi {
     @PostMapping
     public ResponseEntity addCar(@RequestBody Car car){
         if(carService.addCar(car)){
-            return new ResponseEntity(HttpStatus.CREATED);
+            return new ResponseEntity<Car>(car, HttpStatus.CREATED);
         }
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -64,7 +67,7 @@ public class CarApi {
     @PutMapping
     public ResponseEntity modCar(@RequestBody Car car){
         if(carService.modCar(car)){
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity<Car>(car, HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
